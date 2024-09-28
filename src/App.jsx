@@ -18,7 +18,29 @@ const initialTravellers = [
   },
 ];
 
+const initalSeats = 10; // 2 are reserved for Rose&Jack
+// maintain a boolean array to represent the seats that are occupied or not
+// seats[i] == true if seat i is occupied, false otherwise
+let seats = Array(initalSeats).fill(false);
+seats[0] = true;
+seats[1] = true;
 
+const styles = {
+  container: {
+    textAlign: 'center',
+  },
+  seatBlock: {
+    width: '30px',
+    height: '30px',
+    margin: '5px',
+  },
+  occupied: {
+    backgroundColor: 'gray',
+  },
+  free: {
+    backgroundColor: 'green',
+  },
+};
 function TravellerRow(props) {
   /*Q3. Placeholder to initialize local variable based on traveller prop.*/
     const traveller = props.traveller;
@@ -146,11 +168,42 @@ class Homepage extends React.Component {
 	super();
 	}
 	render(){
+    const totalSeats = this.props.fullCapacity; // Total number of seats: 10
+    const occupiedCount = this.props.travellers.length;
+    const freeCount = totalSeats - occupiedCount; 
+    const freeSeatsProportion = ((freeCount / totalSeats) * 100).toFixed(2);
+    const occupiedSeatsProportion = ((occupiedCount / totalSeats) * 100).toFixed(2);
+    let blocks = [];
+    for (let index = 0; index < totalSeats; index++) {
+      if (index < occupiedCount) {
+        blocks.push('occupied');
+      } else {
+        blocks.push('free');
+      }
+    }
+
 	return (
-	<div>
+	<div style={styles.container}>
 		{/*Q2. Placeholder for Homepage code that shows free seats visually.*/}
     <h2>Homepage - Visual Representation of Free Seats</h2>
-    <div>Total Free Seats: {this.props.totalFreeSeats}</div>
+    <div>Total Seats: {totalSeats}</div>
+        <div>Free Seats: {freeCount} ({freeSeatsProportion}%)</div>
+        <div>Occupied Seats: {occupiedCount} ( {occupiedSeatsProportion}%)</div>
+        <div className="seating-arrangement"> 
+        { 
+          blocks.map((status, index) => (
+              <div
+                key={index}
+                style={{
+                  ...styles.seatBlock,
+                  ...(status == 'occupied' ? styles.occupied : styles.free),
+                }}
+              >
+              </div>
+            )
+          )
+        }
+        </div>
 	</div>);
 	}
 }
@@ -172,7 +225,7 @@ class NavigationBar extends React.Component {
 class TicketToRide extends React.Component {
   constructor() {
     super();
-    this.state = { travellers: [], selector: 1, idCounter: 2 };
+    this.state = { travellers: [], selector: 1, idCounter: 2, fullCapacity: 10, seats: seats };
     this.bookTraveller = this.bookTraveller.bind(this);
     this.deleteTraveller = this.deleteTraveller.bind(this);
     this.setSelector = this.setSelector.bind(this);
@@ -226,7 +279,7 @@ class TicketToRide extends React.Component {
       <div>
         {/*Only one of the below four divisions is rendered based on the button clicked by the user.*/}
         {/*Q2 and Q6. Code to call Instance that draws Homepage. Homepage shows Visual Representation of free seats.*/
-        this.state.selector === 1 && <Homepage />
+        this.state.selector === 1 && <Homepage travellers={this.state.travellers} fullCapacity={this.state.fullCapacity} />
         }
         {/*Q3. Code to call component that Displays Travellers.*/
         this.state.selector === 2 && <Display travellers={this.state.travellers} />
