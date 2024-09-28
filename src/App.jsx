@@ -18,10 +18,19 @@ const initialTravellers = [
 
 
 function TravellerRow(props) {
-  {/*Q3. Placeholder to initialize local variable based on traveller prop.*/}
+  /*Q3. Placeholder to initialize local variable based on traveller prop.*/
+    const traveller = props.traveller;
+    const { id, name, phone, bookingTime, address, email, nationality } = traveller;
   return (
     <tr>
 	  {/*Q3. Placeholder for rendering one row of a table with required traveller attribute values.*/}
+      <td>{id}</td>
+      <td>{name}</td>
+      <td>{phone}</td>
+      <td>{bookingTime.toLocaleString()}</td> 
+      <td>{address}</td>
+      <td>{email}</td>
+      <td>{nationality}</td>
     </tr>
   );
 }
@@ -29,6 +38,7 @@ function TravellerRow(props) {
 function Display(props) {
   
 	/*Q3. Write code to render rows of table, reach corresponding to one traveller. Make use of the TravellerRow function that draws one row.*/
+  const tableRows = props.travellers.map(traveller => <TravellerRow key={traveller.id} traveller={traveller} />);
 
   return (
     <table className="bordered-table">
@@ -39,10 +49,14 @@ function Display(props) {
           <th>Name</th>
           <th>Phone</th>
           <th>Booking Time</th>
+          <th>Address</th>
+          <th>Email</th>
+          <th>Nationality</th>
         </tr>
       </thead>
       <tbody>
         {/*Q3. write code to call the JS variable defined at the top of this function to render table rows.*/}
+        {tableRows}
       </tbody>
     </table>
   );
@@ -166,6 +180,7 @@ class TicketToRide extends React.Component {
         this.state.selector === 1 && <Homepage />
         }
         {/*Q3. Code to call component that Displays Travellers.*/
+        this.state.selector === 2 && <Display travellers={this.state.travellers} />
         }
         
         {/*Q4. Code to call the component that adds a traveller.*/}
