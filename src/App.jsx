@@ -20,6 +20,7 @@ const initialTravellers = [
 function TravellerRow(props) {
   /*Q3. Placeholder to initialize local variable based on traveller prop.*/
     const traveller = props.traveller;
+    // Since the id is always unique even if deleted, display table may not be consecutive 
     const { id, name, phone, bookingTime, address, email, nationality } = traveller;
   return (
     <tr>
@@ -107,14 +108,26 @@ class Delete extends React.Component {
   handleSubmit(e) {
     e.preventDefault();
     /*Q5. Fetch the passenger details from the deletion form and call deleteTraveller()*/
+    const form = document.forms.deleteTraveller;
+    this.props.deleteTraveller({
+      name: form.travellername.value,
+      phone: form.travellerphone.value,
+      address: form.travelleraddress.value,
+      email: form.travelleremail.value,
+      nationality: form.travellernationality.value,
+    })
   }
 
   render() {
     return (
       <form name="deleteTraveller" onSubmit={this.handleSubmit}>
 	    {/*Q5. Placeholder form to enter information on which passenger's ticket needs to be deleted. Below code is just an example.*/}
-	<input type="text" name="travellername" placeholder="Name" />
-        <button>Delete</button>
+      <input type="text" name="travellername" placeholder="Name" />
+      <input type="text" name="travellerphone" placeholder="Phone" />
+      <input type="text" name="travelleraddress" placeholder="Address" />
+      <input type="text" name="travelleremail" placeholder="Email" />
+      <input type="text" name="travellernationality" placeholder="Nationality" />
+      <button>Delete</button>
       </form>
     );
   }
@@ -174,6 +187,7 @@ class TicketToRide extends React.Component {
 
   bookTraveller(passenger) {
 	    /*Q4. Write code to add a passenger to the traveller state variable.*/
+      // Even if deleted, the id should be unique
       const newId = this.state.idCounter + 1; 
       passenger.id = newId; 
       this.setState({travellers : this.state.travellers.concat(passenger), idCounter : newId});
@@ -181,6 +195,16 @@ class TicketToRide extends React.Component {
 
   deleteTraveller(passenger) {
 	  /*Q5. Write code to delete a passenger from the traveller state variable.*/
+    // note that once deleted, the id is not reused
+    // and all records that match are deleted, no matter what booking time is
+    const updatedTravellers = this.state.travellers.filter(traveller => {
+      return !(traveller.name == passenger.name && 
+               traveller.phone == passenger.phone && 
+               traveller.address == passenger.address && 
+               traveller.email == passenger.email && 
+               traveller.nationality == passenger.nationality);
+    });
+    this.setState({ travellers: updatedTravellers });
   }
   render() {
     return (
@@ -203,7 +227,9 @@ class TicketToRide extends React.Component {
         {/*Q4. Code to call the component that adds a traveller.*/
         this.state.selector === 3 && <Add bookTraveller={this.bookTraveller} />
         }
-        {/*Q5. Code to call the component that deletes a traveller based on a given attribute.*/}
+        {/*Q5. Code to call the component that deletes a traveller based on a given attribute.*/
+        this.state.selector === 4 && <Delete deleteTraveller={this.deleteTraveller} />
+        }
       </div>
       </div>
     );
