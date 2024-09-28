@@ -20,8 +20,8 @@ const initialTravellers = [
 
 const initalSeats = 10; // 2 are reserved for Rose&Jack
 // maintain a boolean array to represent the seats that are occupied or not
-// seats[i] == true if seat i is occupied, false otherwise
 let seats = Array(initalSeats).fill(false);
+// seats[i] == true if seat i is occupied, false otherwise
 seats[0] = true;
 seats[1] = true;
 
@@ -107,7 +107,7 @@ class Add extends React.Component {
       address: form.travelleraddress.value,
       email: form.travelleremail.value, 
       nationality: form.travellernationality.value,
-      seatNum: form.travellerseatnum.value,
+      seatNum: parseInt(form.travellerseatnum.value, 10)
     });
   }
 
@@ -138,12 +138,12 @@ class Delete extends React.Component {
     /*Q5. Fetch the passenger details from the deletion form and call deleteTraveller()*/
     const form = document.forms.deleteTraveller;
     this.props.deleteTraveller({
-      name: form.travellername.value,
-      phone: form.travellerphone.value,
-      address: form.travelleraddress.value,
-      email: form.travelleremail.value,
-      nationality: form.travellernationality.value,
-      seatNum: form.travellernationality.value,
+      name: form.travellernamed.value,
+      phone: form.travellerphoned.value,
+      address: form.travelleraddressd.value,
+      email: form.travelleremaild.value,
+      nationality: form.travellernationalityd.value,
+      seatNum: parseInt(form.travellerseatnumd.value, 10)
     })
   }
 
@@ -151,12 +151,12 @@ class Delete extends React.Component {
     return (
       <form name="deleteTraveller" onSubmit={this.handleSubmit}>
 	    {/*Q5. Placeholder form to enter information on which passenger's ticket needs to be deleted. Below code is just an example.*/}
-      <input type="text" name="travellername" placeholder="Name" />
-      <input type="text" name="travellerphone" placeholder="Phone" />
-      <input type="text" name="travelleraddress" placeholder="Address" />
-      <input type="text" name="travelleremail" placeholder="Email" />
-      <input type="text" name="travellernationality" placeholder="Nationality" />
-      <input type="text" name="travellerseatnum" placeholder="Seat Number" />
+      <input type="text" name="travellernamed" placeholder="Name" />
+      <input type="text" name="travellerphoned" placeholder="Phone" />
+      <input type="text" name="travelleraddressd" placeholder="Address" />
+      <input type="text" name="travelleremaild" placeholder="Email" />
+      <input type="text" name="travellernationalityd" placeholder="Nationality" />
+      <input type="text" name="travellerseatnumd" placeholder="Seat Number" />
       <button>Delete</button>
       </form>
     );
@@ -225,7 +225,7 @@ class NavigationBar extends React.Component {
 class TicketToRide extends React.Component {
   constructor() {
     super();
-    this.state = { travellers: [], selector: 1, idCounter: 2, fullCapacity: 10, seats: seats };
+    this.state = { travellers: [], selector: 1, idCounter: 2, fullCapacity: 10, seats: [] };
     this.bookTraveller = this.bookTraveller.bind(this);
     this.deleteTraveller = this.deleteTraveller.bind(this);
     this.setSelector = this.setSelector.bind(this);
@@ -242,7 +242,7 @@ class TicketToRide extends React.Component {
 
   loadData() {
     setTimeout(() => {
-      this.setState({ travellers: initialTravellers });
+      this.setState({ travellers: initialTravellers, seats: seats});
     }, 500);
   }
 
@@ -251,13 +251,34 @@ class TicketToRide extends React.Component {
       // Even if deleted, the id should be unique
       const newId = this.state.idCounter + 1; 
       passenger.id = newId; 
-      this.setState({travellers : this.state.travellers.concat(passenger), idCounter : newId});
-  }
+      // handle the seat status
+      if (passenger.seatNum < 0 || passenger.seatNum > this.state.fullCapacity) {
+        alert("Invalid seat number!");
+        return;
+      }
+      // check if all seats are occupied
+      if (this.state.travellers.length >= this.state.fullCapacity) {
+        alert("All seats are occupied!");
+        return;
+      }
+      // check if the seat is already occupied but not all seats are occupied
+      if (this.state.seats[passenger.seatNum - 1]) {
+        alert("Seat already occupied! Please choose another one.");
+        return;
+      }
+      // update the seat status
+      this.state.seats[passenger.seatNum - 1] = true;
+      this.setState({travellers : this.state.travellers.concat(passenger), idCounter : newId
+        , seats: this.state.seats });
+      alert("Record added successfully!");
+    };
 
   deleteTraveller(passenger) {
 	  /*Q5. Write code to delete a passenger from the traveller state variable.*/
-    // note that once deleted, the id is not reused
+    // Note that once deleted, the id is not reused
     // and all records that match are deleted, no matter what booking time is
+    // console.log(passenger);
+    // console.log(this.state.travellers);
     const updatedTravellers = this.state.travellers.filter(traveller => {
       return !(traveller.name == passenger.name && 
                traveller.phone == passenger.phone && 
@@ -265,7 +286,12 @@ class TicketToRide extends React.Component {
                traveller.email == passenger.email && 
                traveller.nationality == passenger.nationality &&  traveller.seatNum == passenger.seatNum);
     });
+    if (updatedTravellers.length == this.state.travellers.length) {
+      alert("No matching record found!");
+      return;
+    }
     this.setState({ travellers: updatedTravellers });
+    alert("Record deleted successfully!");
   }
   render() {
     return (
@@ -282,11 +308,11 @@ class TicketToRide extends React.Component {
         this.state.selector === 1 && <Homepage travellers={this.state.travellers} fullCapacity={this.state.fullCapacity} />
         }
         {/*Q3. Code to call component that Displays Travellers.*/
-        this.state.selector === 2 && <Display travellers={this.state.travellers} />
+        this.state.selector === 2 && <Display travellers={this.state.travellers} seats={this.state.seats} />
         }
         
         {/*Q4. Code to call the component that adds a traveller.*/
-        this.state.selector === 3 && <Add bookTraveller={this.bookTraveller} />
+        this.state.selector === 3 && <Add bookTraveller={this.bookTraveller} seats={this.state.seats} />
         }
         {/*Q5. Code to call the component that deletes a traveller based on a given attribute.*/
         this.state.selector === 4 && <Delete deleteTraveller={this.deleteTraveller} />
