@@ -6,6 +6,7 @@ const initialTravellers = [
     email: 'jk@gmail.com',
     address: '123, Titanic St, NY',
     nationality: 'UK',
+    seatNum: 1,
   },
   {
     id: 2, name: 'Rose', phone: 88884444,
@@ -13,6 +14,7 @@ const initialTravellers = [
     email: 'rs@gmail.com',
     address: '123, Titanic St, NY',
     nationality: 'UK',
+    seatNum: 2,
   },
 ];
 
@@ -21,7 +23,7 @@ function TravellerRow(props) {
   /*Q3. Placeholder to initialize local variable based on traveller prop.*/
     const traveller = props.traveller;
     // Since the id is always unique even if deleted, display table may not be consecutive 
-    const { id, name, phone, bookingTime, address, email, nationality } = traveller;
+    const { id, name, phone, bookingTime, address, email, nationality, seatNum } = traveller;
   return (
     <tr>
 	  {/*Q3. Placeholder for rendering one row of a table with required traveller attribute values.*/}
@@ -32,6 +34,7 @@ function TravellerRow(props) {
       <td>{address}</td>
       <td>{email}</td>
       <td>{nationality}</td>
+      <td>{seatNum}</td>
     </tr>
   );
 }
@@ -53,6 +56,7 @@ function Display(props) {
           <th>Address</th>
           <th>Email</th>
           <th>Nationality</th>
+          <th>Seat Number</th>
         </tr>
       </thead>
       <tbody>
@@ -81,6 +85,7 @@ class Add extends React.Component {
       address: form.travelleraddress.value,
       email: form.travelleremail.value, 
       nationality: form.travellernationality.value,
+      seatNum: form.travellerseatnum.value,
     });
   }
 
@@ -93,6 +98,7 @@ class Add extends React.Component {
         <input type="text" name="travelleraddress" placeholder="Address" />
         <input type="text" name="travelleremail" placeholder="Email" />
         <input type="text" name="travellernationality" placeholder="Nationality" />
+        <input type="text" name="travellerseatnum" placeholder="Seat Number" />
         <button>Add</button>
       </form>
     );
@@ -115,6 +121,7 @@ class Delete extends React.Component {
       address: form.travelleraddress.value,
       email: form.travelleremail.value,
       nationality: form.travellernationality.value,
+      seatNum: form.travellernationality.value,
     })
   }
 
@@ -127,6 +134,7 @@ class Delete extends React.Component {
       <input type="text" name="travelleraddress" placeholder="Address" />
       <input type="text" name="travelleremail" placeholder="Email" />
       <input type="text" name="travellernationality" placeholder="Nationality" />
+      <input type="text" name="travellerseatnum" placeholder="Seat Number" />
       <button>Delete</button>
       </form>
     );
@@ -202,7 +210,7 @@ class TicketToRide extends React.Component {
                traveller.phone == passenger.phone && 
                traveller.address == passenger.address && 
                traveller.email == passenger.email && 
-               traveller.nationality == passenger.nationality);
+               traveller.nationality == passenger.nationality &&  traveller.seatNum == passenger.seatNum);
     });
     this.setState({ travellers: updatedTravellers });
   }
